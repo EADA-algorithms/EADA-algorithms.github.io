@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bubble Sort Lab — AI & Business Track</title>
+    <style>
+      :root {
+        --bg: #0b1726;
+        --panel: #0f2438;
+        --panel-2: #0d1d2d;
+        --text: #e5ecf5;
+        --muted: #9fb4ce;
+        --accent: #14b8a6;
+        --accent-2: #f59e0b;
+        --danger: #ef4444;
+        --code-bg: #0a1c2f;
+        --border: #1f3650;
+        --shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+        font-family: "Space Grotesk", "Segoe UI", system-ui, -apple-system,
+          sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: radial-gradient(
+            circle at 20% 20%,
+            rgba(20, 184, 166, 0.08),
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at 80% 0%,
+            rgba(245, 158, 11, 0.08),
+            transparent 28%
+          ),
+          linear-gradient(120deg, #07101b, #0c1a2a 40%, #07101b);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      header {
+        padding: 28px 24px 12px;
+        position: sticky;
+        top: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(11, 23, 38, 0.92),
+          rgba(11, 23, 38, 0.4)
+        );
+        backdrop-filter: blur(10px);
+        z-index: 5;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .container {
+        width: min(1100px, 96vw);
+        margin: 0 auto 64px;
+        padding: 0 0 48px;
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: var(--muted);
+        max-width: 820px;
+        line-height: 1.6;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 18px;
+        margin: 28px 0;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px 18px 16px;
+        box-shadow: var(--shadow);
+      }
+
+      .card h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        letter-spacing: -0.2px;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        letter-spacing: 0.3px;
+        background: rgba(20, 184, 166, 0.16);
+        color: var(--accent);
+        border: 1px solid rgba(20, 184, 166, 0.32);
+        margin-right: 8px;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        background: rgba(245, 158, 11, 0.12);
+        color: var(--accent-2);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+      }
+
+      .code {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #cde6ff;
+        overflow-x: auto;
+        white-space: pre-wrap;
+      }
+
+      .section-title {
+        margin: 36px 0 12px;
+        font-size: 22px;
+        letter-spacing: -0.4px;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 14px;
+        margin: 16px 0;
+      }
+
+      .step {
+        background: var(--panel-2);
+        border: 1px dashed var(--border);
+        border-radius: 10px;
+        padding: 12px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0 4px;
+      }
+
+      .chip {
+        background: rgba(229, 236, 245, 0.08);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 13px;
+      }
+
+      .chip.active-chip {
+        background: rgba(20, 184, 166, 0.18);
+        border-color: rgba(20, 184, 166, 0.4);
+        color: var(--accent);
+      }
+
+      .chip.good {
+        background: rgba(245, 158, 11, 0.16);
+        border-color: rgba(245, 158, 11, 0.4);
+        color: var(--accent-2);
+      }
+
+      button {
+        background: var(--accent);
+        color: #052226;
+        border: none;
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        transition: transform 0.08s ease, box-shadow 0.15s ease,
+          background 0.2s ease;
+        box-shadow: 0 10px 28px rgba(20, 184, 166, 0.3);
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+      button:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      }
+
+      button.secondary {
+        background: rgba(229, 236, 245, 0.08);
+        color: var(--text);
+        border: 1px solid var(--border);
+        box-shadow: none;
+      }
+
+      button.warning {
+        background: var(--accent-2);
+        color: #1f1404;
+      }
+      button.danger {
+        background: var(--danger);
+        color: #22070a;
+      }
+
+      .playground {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+        margin: 12px 0 24px;
+      }
+
+      .bars {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 6px;
+        height: 220px;
+        margin: 18px 0 12px;
+        padding: 12px;
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+
+      .bar {
+        flex: 1;
+        min-width: 16px;
+        background: linear-gradient(180deg, #16c1b1, #0f766e);
+        border-radius: 8px 8px 4px 4px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        color: #031312;
+        font-weight: 700;
+        padding-bottom: 6px;
+        transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+        opacity: 0.9;
+      }
+
+      .bar.active {
+        background: linear-gradient(180deg, #f59e0b, #b45309);
+        opacity: 1;
+        transform: translateY(-6px);
+      }
+      .bar.done {
+        background: linear-gradient(180deg, #94a3b8, #475569);
+        opacity: 0.7;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-top: 6px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .stat {
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 12px;
+      }
+
+      .stat .label {
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.4px;
+      }
+      .stat .value {
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .status-line {
+        color: var(--muted);
+        margin: 8px 0 2px;
+      }
+
+      .quiz {
+        margin-top: 12px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .question {
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+
+      .question input {
+        margin-right: 8px;
+      }
+
+      .notice {
+        margin-top: 8px;
+        color: var(--accent);
+        font-weight: 600;
+        min-height: 22px;
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      @media (max-width: 720px) {
+        .controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        button {
+          width: 100%;
+        }
+        .bars {
+          height: 180px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="badge">AI & Business Track</div>
+        <div class="pill">Built for Python beginners</div>
+        <h1>Bubble Sort Lab — Learn, Code, Play</h1>
+        <p class="subtitle">
+          Walk through Python basics, see how bubble sort works, and practice
+          making the swap/no-swap decision just like you would when coding it
+          yourself. Open this file locally in your browser — no installs
+          required.
+        </p>
+      </div>
+    </header>
+
+    <main class="container">
+      <section>
+        <h2 class="section-title">Python Primer (10 minutes)</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>1) Variables & types</h3>
+            <div class="code">
+              name = "Aisha" price = 19.5 seats = 30 is_ai_student = True
+            </div>
+            <div class="hint">
+              Use lowercase_with_underscores for variable names. Strings in
+              quotes, numbers bare, booleans capitalized.
+            </div>
+          </div>
+          <div class="card">
+            <h3>2) Lists & indexing</h3>
+            <div class="code">
+              scores = [88, 92, 76] first = scores[0] # 88 last = scores[-1] #
+              76 scores.append(99) # add
+            </div>
+            <div class="hint">
+              Lists are ordered and zero-indexed. Negative indices count from
+              the end.
+            </div>
+          </div>
+          <div class="card">
+            <h3>3) Loops & decisions</h3>
+            <div class="code">
+              for score in scores: if score >= 90: print("great") else:
+              print("keep going")
+            </div>
+            <div class="hint">
+              Indentation defines the block. `if/elif/else` controls decisions.
+            </div>
+          </div>
+          <div class="card">
+            <h3>4) Functions</h3>
+            <div class="code">
+              def bubble_sort(arr): n = len(arr) for i in range(n): for j in
+              range(0, n - 1 - i): if arr[j] > arr[j + 1]: arr[j], arr[j + 1] =
+              arr[j + 1], arr[j] return arr
+            </div>
+            <div class="hint">
+              `def` creates reusable logic. Parameters are inputs; `return`
+              sends back a result.
+            </div>
+          </div>
+          <div class="card">
+            <h3>Loop + if visualizer</h3>
+            <p class="hint">
+              Step through a tiny loop that prints "great" for scores ≥ 90 and
+              "keep going" otherwise.
+            </p>
+            <div class="chips" id="loopList"></div>
+            <div class="status-line" id="loopStatus">Click step to start.</div>
+            <div class="controls">
+              <button id="loopStep">Step</button>
+              <button class="secondary" id="loopReset">Reset</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Primer quick quiz (with explanations)</h2>
+        <div class="quiz">
+          <div class="question">
+            A) Which variable name follows Python style for a boolean?
+            <div>
+              <label><input type="radio" name="pq1" value="a" />IsStudent</label
+              ><br />
+              <label
+                ><input type="radio" name="pq1" value="b" />is_student</label
+              ><br />
+              <label
+                ><input type="radio" name="pq1" value="c" />isStudent?</label
+              >
+            </div>
+          </div>
+          <div class="question">
+            B) What does scores[-1] return?
+            <div>
+              <label
+                ><input type="radio" name="pq2" value="a" />The first
+                item</label
+              ><br />
+              <label
+                ><input type="radio" name="pq2" value="b" />The last item</label
+              ><br />
+              <label
+                ><input type="radio" name="pq2" value="c" />Causes an
+                error</label
+              >
+            </div>
+          </div>
+          <div class="question">
+            C) In the loop below, when does it print "great"?
+            <div class="code">
+              for score in scores: if score >= 90: print("great") else:
+              print("keep going")
+            </div>
+            <div>
+              <label
+                ><input type="radio" name="pq3" value="a" />When score is
+                greater than or equal to 90</label
+              ><br />
+              <label
+                ><input type="radio" name="pq3" value="b" />When score is
+                exactly 90</label
+              ><br />
+              <label
+                ><input type="radio" name="pq3" value="c" />Never, because of
+                indentation</label
+              >
+            </div>
+          </div>
+          <button id="checkPrimerQuiz">Check primer answers</button>
+          <div class="notice" id="primerQuizResult"></div>
+          <div class="hint" id="primerQuizExplain"></div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Bubble Sort — the idea</h2>
+        <div class="steps">
+          <div class="step">
+            <strong>Pass-based:</strong> Repeatedly scan neighbors left→right.
+            After pass i, the i largest items sit at the end.
+          </div>
+          <div class="step">
+            <strong>Decision rule:</strong> If left &gt; right, swap; otherwise
+            keep the order.
+          </div>
+          <div class="step">
+            <strong>Early exit:</strong> If a full pass makes zero swaps, the
+            list was already sorted.
+          </div>
+          <div class="step">
+            <strong>Costs:</strong> $O(n^2)$ time, $O(1)$ extra space. Fine for
+            small N, bad for large data.
+          </div>
+        </div>
+        <div class="card">
+          <h3>Why AI & business students should care</h3>
+          <ul>
+            <li>
+              Data hygiene: understanding stable, in-place operations is key
+              before touching ML pipelines.
+            </li>
+            <li>
+              Complexity intuition: learn why quadratic time hurts as datasets
+              grow.
+            </li>
+            <li>
+              Debug mindset: the swap/no-swap decision is the micro-skill you’ll
+              reuse in more advanced algorithms.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Interactive Bubble Sort Lab</h2>
+        <div class="playground">
+          <div class="controls">
+            <div>
+              <label for="size" class="hint">Array size</label><br />
+              <input type="range" id="size" min="4" max="12" value="7" />
+              <span id="sizeLabel">7</span>
+            </div>
+            <button id="reset">New random list</button>
+            <button class="secondary" id="shuffle">Shuffle same list</button>
+            <button class="warning" id="auto">Auto-play (correct)</button>
+            <button class="danger" id="stopAuto" style="display: none">
+              Stop auto
+            </button>
+          </div>
+
+          <div class="bars" id="bars" aria-live="polite"></div>
+          <div class="status-line" id="status">Ready.</div>
+
+          <div class="controls">
+            <button id="swapBtn">Swap (left &gt; right)</button>
+            <button class="secondary" id="keepBtn">Keep order</button>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="label">Pass</div>
+              <div class="value" id="passStat">1</div>
+            </div>
+            <div class="stat">
+              <div class="label">Comparison</div>
+              <div class="value" id="compStat">0</div>
+            </div>
+            <div class="stat">
+              <div class="label">Swaps</div>
+              <div class="value" id="swapStat">0</div>
+            </div>
+            <div class="stat">
+              <div class="label">Score</div>
+              <div class="value" id="scoreStat">0/0</div>
+            </div>
+          </div>
+        </div>
+        <p class="hint">
+          Tip: Choose swap if the left bar is taller than the right. Watch how
+          each pass settles the largest item to the end.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="section-title">Quick Quiz</h2>
+        <div class="quiz" id="quiz">
+          <div class="question">
+            1) When does bubble sort finish early?
+            <div>
+              <label
+                ><input type="radio" name="q1" value="a" />When the array length
+                is even.</label
+              ><br />
+              <label
+                ><input type="radio" name="q1" value="b" />When a full pass
+                makes no swaps.</label
+              ><br />
+              <label
+                ><input type="radio" name="q1" value="c" />After exactly n
+                passes, no matter what.</label
+              >
+            </div>
+          </div>
+          <div class="question">
+            2) In code, which condition triggers a swap?
+            <div>
+              <label
+                ><input type="radio" name="q2" value="a" />if arr[j] &lt; arr[j
+                + 1]</label
+              ><br />
+              <label
+                ><input type="radio" name="q2" value="b" />if arr[j] == arr[j +
+                1]</label
+              ><br />
+              <label
+                ><input type="radio" name="q2" value="c" />if arr[j] &gt; arr[j
+                + 1]</label
+              >
+            </div>
+          </div>
+          <div class="question">
+            3) Complexity check: bubble sort time cost is...
+            <div>
+              <label><input type="radio" name="q3" value="a" />O(n log n)</label
+              ><br />
+              <label><input type="radio" name="q3" value="b" />O(n^2)</label
+              ><br />
+              <label><input type="radio" name="q3" value="c" />O(1)</label>
+            </div>
+          </div>
+          <button id="checkQuiz">Check answers</button>
+          <div class="notice" id="quizResult"></div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Utility helpers
+      const rndInt = (min, max) =>
+        Math.floor(Math.random() * (max - min + 1)) + min;
+      const isSorted = (arr) => arr.every((v, i) => i === 0 || arr[i - 1] <= v);
+
+      const state = {
+        base: [],
+        arr: [],
+        i: 0,
+        j: 0,
+        comparisons: 0,
+        swaps: 0,
+        correct: 0,
+        total: 0,
+        autoTimer: null,
+      };
+
+      const els = {
+        size: document.getElementById("size"),
+        sizeLabel: document.getElementById("sizeLabel"),
+        bars: document.getElementById("bars"),
+        status: document.getElementById("status"),
+        passStat: document.getElementById("passStat"),
+        compStat: document.getElementById("compStat"),
+        swapStat: document.getElementById("swapStat"),
+        scoreStat: document.getElementById("scoreStat"),
+        swapBtn: document.getElementById("swapBtn"),
+        keepBtn: document.getElementById("keepBtn"),
+        reset: document.getElementById("reset"),
+        shuffle: document.getElementById("shuffle"),
+        auto: document.getElementById("auto"),
+        stopAuto: document.getElementById("stopAuto"),
+        quizResult: document.getElementById("quizResult"),
+        loopList: document.getElementById("loopList"),
+        loopStatus: document.getElementById("loopStatus"),
+        loopStep: document.getElementById("loopStep"),
+        loopReset: document.getElementById("loopReset"),
+        primerQuizResult: document.getElementById("primerQuizResult"),
+        primerQuizExplain: document.getElementById("primerQuizExplain"),
+      };
+
+      const loopState = {
+        arr: [88, 92, 76, 91],
+        idx: 0,
+      };
+
+      function newBase(len) {
+        const arr = Array.from({ length: len }, () => rndInt(2, 30));
+        state.base = [...arr];
+        loadArray(arr);
+      }
+
+      function loadArray(arr) {
+        state.arr = [...arr];
+        state.i = 0;
+        state.j = 0;
+        state.comparisons = 0;
+        state.swaps = 0;
+        state.correct = 0;
+        state.total = 0;
+        stopAutoPlay();
+        render();
+        setStatus("Ready. Make the first decision.");
+      }
+
+      function renderLoop() {
+        els.loopList.innerHTML = "";
+        loopState.arr.forEach((val, idx) => {
+          const chip = document.createElement("div");
+          chip.className = "chip";
+          if (idx === loopState.idx) chip.classList.add("active-chip");
+          if (val >= 90) chip.classList.add("good");
+          chip.textContent = val;
+          els.loopList.appendChild(chip);
+        });
+      }
+
+      function resetLoop() {
+        loopState.idx = 0;
+        els.loopStatus.textContent = "Click step to start.";
+        renderLoop();
+      }
+
+      function stepLoop() {
+        const val = loopState.arr[loopState.idx];
+        const meets = val >= 90;
+        els.loopStatus.textContent = `score=${val} -> ${
+          meets
+            ? 'if branch: print("great")'
+            : 'else branch: print("keep going")'
+        }`;
+        loopState.idx = (loopState.idx + 1) % loopState.arr.length;
+        renderLoop();
+      }
+
+      function render() {
+        els.bars.innerHTML = "";
+        const n = state.arr.length;
+        state.arr.forEach((val, idx) => {
+          const bar = document.createElement("div");
+          bar.className = "bar";
+          const height = 16 + (val / Math.max(...state.arr)) * 160;
+          bar.style.height = height + "px";
+          bar.textContent = val;
+          if (idx === state.j || idx === state.j + 1)
+            bar.classList.add("active");
+          if (idx >= n - state.i) bar.classList.add("done");
+          els.bars.appendChild(bar);
+        });
+
+        els.passStat.textContent = Math.min(state.i + 1, state.arr.length);
+        els.compStat.textContent = state.comparisons;
+        els.swapStat.textContent = state.swaps;
+        els.scoreStat.textContent = `${state.correct}/${state.total}`;
+      }
+
+      function setStatus(msg) {
+        els.status.textContent = msg;
+      }
+
+      function advancePointers(swapped) {
+        const n = state.arr.length;
+        const settledNow = n - 1 - state.i;
+        const atPassEnd = state.j >= settledNow;
+        if (atPassEnd) {
+          state.i += 1;
+          state.j = 0;
+          if (isSorted(state.arr)) {
+            render();
+            setStatus("Sorted! Great job.");
+            stopAutoPlay();
+            return true;
+          }
+        } else {
+          state.j += 1;
+        }
+        render();
+        return false;
+      }
+
+      function handleChoice(shouldSwap) {
+        if (isSorted(state.arr)) {
+          setStatus("Already sorted. Reset or change size to continue.");
+          return;
+        }
+
+        const n = state.arr.length;
+        if (state.i >= n - 1) {
+          setStatus("All passes complete. Reset to try again.");
+          return;
+        }
+
+        const left = state.arr[state.j];
+        const right = state.arr[state.j + 1];
+        const needSwap = left > right;
+
+        state.total += 1;
+        state.comparisons += 1;
+
+        if (shouldSwap && needSwap) {
+          state.correct += 1;
+          [state.arr[state.j], state.arr[state.j + 1]] = [right, left];
+          state.swaps += 1;
+          setStatus("Correct: swapped.");
+        } else if (!shouldSwap && !needSwap) {
+          state.correct += 1;
+          setStatus("Correct: kept order.");
+        } else if (shouldSwap && !needSwap) {
+          [state.arr[state.j], state.arr[state.j + 1]] = [right, left];
+          state.swaps += 1;
+          setStatus("Not needed: left was already <= right.");
+        } else {
+          setStatus("Swap was needed. Watch how it affects later steps.");
+        }
+
+        const finished = advancePointers(shouldSwap);
+        if (!finished && isSorted(state.arr)) {
+          setStatus("List is sorted early. Nice!");
+        }
+      }
+
+      function autoStep() {
+        if (isSorted(state.arr)) {
+          stopAutoPlay();
+          return;
+        }
+        const left = state.arr[state.j];
+        const right = state.arr[state.j + 1];
+        handleChoice(left > right);
+      }
+
+      function startAutoPlay() {
+        stopAutoPlay();
+        els.auto.style.display = "none";
+        els.stopAuto.style.display = "inline-block";
+        state.autoTimer = setInterval(autoStep, 520);
+        setStatus("Auto-play running the correct choices.");
+      }
+
+      function stopAutoPlay() {
+        if (state.autoTimer) {
+          clearInterval(state.autoTimer);
+          state.autoTimer = null;
+        }
+        els.auto.style.display = "inline-block";
+        els.stopAuto.style.display = "none";
+      }
+
+      // Quiz logic
+      function checkQuiz() {
+        const answers = { q1: "b", q2: "c", q3: "b" };
+        let correct = 0;
+        Object.keys(answers).forEach((q) => {
+          const chosen = document.querySelector(`input[name="${q}"]:checked`);
+          if (chosen && chosen.value === answers[q]) correct += 1;
+        });
+        if (correct === 3) {
+          els.quizResult.textContent =
+            "Spot on — you are ready to code it in Python!";
+        } else {
+          els.quizResult.textContent = `You got ${correct}/3. Revisit the primer and try again.`;
+        }
+      }
+
+      function checkPrimerQuiz() {
+        const answers = { pq1: "b", pq2: "b", pq3: "a" };
+        const explanations = {
+          pq1: "Use snake_case like is_student for readability.",
+          pq2: "Index -1 is the last element of the list.",
+          pq3: "The if branch runs when score is greater than or equal to 90.",
+        };
+        let correct = 0;
+        const notes = [];
+        Object.keys(answers).forEach((q) => {
+          const chosen = document.querySelector(`input[name="${q}"]:checked`);
+          if (chosen && chosen.value === answers[q]) correct += 1;
+          notes.push(`${q.toUpperCase()}: ${explanations[q]}`);
+        });
+        els.primerQuizResult.textContent = `You got ${correct}/3.`;
+        els.primerQuizExplain.textContent = notes.join(" | ");
+      }
+
+      // Event wiring
+      els.size.addEventListener("input", (e) => {
+        els.sizeLabel.textContent = e.target.value;
+        newBase(Number(e.target.value));
+      });
+
+      els.reset.addEventListener("click", () =>
+        newBase(Number(els.size.value))
+      );
+      els.shuffle.addEventListener("click", () =>
+        loadArray(state.base.sort(() => Math.random() - 0.5))
+      );
+      els.swapBtn.addEventListener("click", () => handleChoice(true));
+      els.keepBtn.addEventListener("click", () => handleChoice(false));
+      els.auto.addEventListener("click", startAutoPlay);
+      els.stopAuto.addEventListener("click", stopAutoPlay);
+      els.loopStep.addEventListener("click", stepLoop);
+      els.loopReset.addEventListener("click", resetLoop);
+
+      document.getElementById("checkQuiz").addEventListener("click", checkQuiz);
+      document
+        .getElementById("checkPrimerQuiz")
+        .addEventListener("click", checkPrimerQuiz);
+
+      // Init
+      newBase(Number(els.size.value));
+      resetLoop();
+    </script>
+  </body>
+</html>
