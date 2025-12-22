@@ -91,6 +91,10 @@
         box-shadow: var(--shadow);
       }
 
+      .card.wide {
+        grid-column: span 2;
+      }
+
       .card h3 {
         margin: 0 0 8px;
         font-size: 18px;
@@ -130,6 +134,40 @@
         color: #cde6ff;
         overflow-x: auto;
         white-space: pre-wrap;
+      }
+
+      .code code {
+        display: block;
+        color: inherit;
+      }
+
+      .code .kw {
+        color: #f59e0b;
+        font-weight: 700;
+      }
+
+      .code .str {
+        color: #fca5a5;
+      }
+
+      .code .num {
+        color: #93c5fd;
+      }
+
+      .code .bool {
+        color: #34d399;
+        font-weight: 700;
+      }
+
+      .code .comment {
+        color: #9fb4ce;
+        font-style: italic;
+      }
+
+      .code.two-col {
+        columns: 2;
+        column-gap: 18px;
+        column-fill: balance;
       }
 
       .section-title {
@@ -346,6 +384,9 @@
         .bars {
           height: 180px;
         }
+        .card.wide {
+          grid-column: span 1;
+        }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -378,45 +419,58 @@
         <div class="grid">
           <div class="card">
             <h3>1) Variables & types</h3>
-            <div class="code">
-              name = "Aisha" price = 19.5 seats = 30 is_ai_student = True
-            </div>
+            <pre
+              class="code"
+            ><code class="language-python">name = <span class="str">"Aisha"</span>
+price = <span class="num">19.5</span>
+seats = <span class="num">30</span>
+is_ai_student = <span class="bool">True</span></code></pre>
             <div class="hint">
-              Use lowercase_with_underscores for variable names. Strings in
-              quotes, numbers bare, booleans capitalized.
+              Strings in quotes, numbers bare, booleans capitalized. It is
+              recommended to use lowercase_with_underscores for variable names
+              but you can choose other styles.
             </div>
           </div>
           <div class="card">
             <h3>2) Lists & indexing</h3>
-            <div class="code">
-              scores = [88, 92, 76] first = scores[0] # 88 last = scores[-1] #
-              76 scores.append(99) # add
-            </div>
+            <pre
+              class="code"
+            ><code class="language-python">scores = [<span class="num">88</span>, <span class="num">92</span>, <span class="num">76</span>]
+first = scores[<span class="num">0</span>]  <span class="comment"># 88</span>
+last = scores[-<span class="num">1</span>]  <span class="comment"># 76</span>
+scores.append(<span class="num">99</span>)  <span class="comment"># add</span></code></pre>
             <div class="hint">
-              Lists are ordered and zero-indexed. Negative indices count from
-              the end.
+              Lists are ordered and zero-indexed (meaning the first element is
+              at index 0). Negative indices count from the end.
             </div>
           </div>
           <div class="card">
             <h3>3) Loops & decisions</h3>
-            <div class="code">
-              for score in scores: if score >= 90: print("great") else:
-              print("keep going")
-            </div>
+            <pre
+              class="code"
+            ><code class="language-python"><span class="kw">for</span> score <span class="kw">in</span> scores:
+    <span class="kw">if</span> score &gt;= <span class="num">90</span>:
+        print(<span class="str">"great"</span>)
+    <span class="kw">else</span>:
+        print(<span class="str">"keep going"</span>)</code></pre>
             <div class="hint">
-              Indentation defines the block. `if/elif/else` controls decisions.
+              Indentation defines the block, so use them consistently.
+              `if/elif/else` controls decisions.
             </div>
           </div>
-          <div class="card">
+          <div class="card wide">
             <h3>4) Functions</h3>
-            <div class="code">
-              def bubble_sort(arr): n = len(arr) for i in range(n): for j in
-              range(0, n - 1 - i): if arr[j] > arr[j + 1]: arr[j], arr[j + 1] =
-              arr[j + 1], arr[j] return arr
-            </div>
+            <pre
+              class="code"
+            ><code class="language-python"><span class="kw">def</span> apply_discount(amount, pct):
+    discount = amount * pct
+    <span class="kw">return</span> amount - discount
+
+receipt = apply_discount(<span class="num">120</span>, <span class="num">0.10</span>)
+vip_receipt = apply_discount(<span class="num">120</span>, <span class="num">0.25</span>)</code></pre>
             <div class="hint">
-              `def` creates reusable logic. Parameters are inputs; `return`
-              sends back a result.
+              Define once, reuse everywhere: change the arguments to get
+              different outputs, and store the returned value.
             </div>
           </div>
           <div class="card">
@@ -439,27 +493,30 @@
         <h2 class="section-title">Primer quick quiz (with explanations)</h2>
         <div class="quiz">
           <div class="question">
-            A) Which variable name follows Python style for a boolean?
+            A) Which option is a Python list of numbers?
             <div>
-              <label><input type="radio" name="pq1" value="a" />IsStudent</label
+              <label
+                ><input type="radio" name="pq1" value="a" />[10, 20, 30]</label
               ><br />
               <label
-                ><input type="radio" name="pq1" value="b" />is_student</label
+                ><input type="radio" name="pq1" value="b" />(10, 20, 30)</label
               ><br />
               <label
-                ><input type="radio" name="pq1" value="c" />isStudent?</label
+                ><input type="radio" name="pq1" value="c" />{10, 20, 30,
+                40}</label
               >
             </div>
           </div>
           <div class="question">
-            B) What does scores[-1] return?
+            B) What does <code>scores[-2]</code> return?
             <div>
               <label
-                ><input type="radio" name="pq2" value="a" />The first
+                ><input type="radio" name="pq2" value="a" />The second
                 item</label
               ><br />
               <label
-                ><input type="radio" name="pq2" value="b" />The last item</label
+                ><input type="radio" name="pq2" value="b" />The penultimate
+                item</label
               ><br />
               <label
                 ><input type="radio" name="pq2" value="c" />Causes an
@@ -468,23 +525,28 @@
             </div>
           </div>
           <div class="question">
-            C) In the loop below, when does it print "great"?
-            <div class="code">
-              for score in scores: if score >= 90: print("great") else:
-              print("keep going")
-            </div>
+            C) In the loop below, when does it print "mid"?
+            <pre
+              class="code"
+            ><code class="language-python"><span class="kw">for</span> score <span class="kw">in</span> scores:
+    <span class="kw">if</span> score &gt;= <span class="num">90</span>:
+        print(<span class="str">"high"</span>)
+    <span class="kw">elif</span> score &gt;= <span class="num">70</span>:
+        print(<span class="str">"mid"</span>)
+    <span class="kw">else</span>:
+        print(<span class="str">"low"</span>)</code></pre>
             <div>
               <label
                 ><input type="radio" name="pq3" value="a" />When score is
-                greater than or equal to 90</label
+                greater between 70 (included) and 90 (excluded)</label
               ><br />
               <label
                 ><input type="radio" name="pq3" value="b" />When score is
-                exactly 90</label
+                greater or equal to 70</label
               ><br />
               <label
-                ><input type="radio" name="pq3" value="c" />Never, because of
-                indentation</label
+                ><input type="radio" name="pq3" value="c" />Never, because only
+                "high" and "low" are possible.</label
               >
             </div>
           </div>
@@ -535,6 +597,17 @@
 
       <section>
         <h2 class="section-title">Interactive Bubble Sort Lab</h2>
+        <div class="card">
+          <p class="hint">
+            You're sorting "lead scores" to decide which customers to call
+            first. Click <b>Swap</b> if the left score is higher than the right,
+            otherwise click <b>Keep order</b>. Try to make the correct decisions
+            as you step through the algorithm! Don't worry if you make mistakes
+            — it's all part of learning and you can recover from them. If you
+            get stuck or want to see the correct moves, use the
+            <b>Auto-play</b> button.
+          </p>
+        </div>
         <div class="playground">
           <div class="controls">
             <div>
@@ -862,11 +935,11 @@
       }
 
       function checkPrimerQuiz() {
-        const answers = { pq1: "b", pq2: "b", pq3: "a" };
+        const answers = { pq1: "a", pq2: "b", pq3: "a" };
         const explanations = {
-          pq1: "Use snake_case like is_student for readability.",
-          pq2: "Index -1 is the last element of the list.",
-          pq3: "The if branch runs when score is greater than or equal to 90.",
+          pq1: "Square brackets make a list; parentheses make a tuple; braces with colons make a dict.",
+          pq2: "Negative indices start from the last element, meaning -1 is the last element of the list and -2 is the penultimate (second to last).",
+          pq3: "The elif (or else if) branch runs when score is in [70,90). That's because the first if handles scores ≥ 90, so only scores less than 90 reach the elif. In that case, scores ≥ 70 trigger the elif branch.",
         };
         let correct = 0;
         const notes = [];
@@ -875,8 +948,13 @@
           if (chosen && chosen.value === answers[q]) correct += 1;
           notes.push(`${q.toUpperCase()}: ${explanations[q]}`);
         });
-        els.primerQuizResult.textContent = `You got ${correct}/3.`;
-        els.primerQuizExplain.textContent = notes.join(" | ");
+        if (correct === Object.keys(answers).length) {
+          els.primerQuizResult.textContent = `Great job — ${correct}/3!`;
+          els.primerQuizExplain.innerHTML = notes.join("<br><br>");
+        } else {
+          els.primerQuizResult.textContent = `You got ${correct}/3. Try again — no hints yet.`;
+          els.primerQuizExplain.textContent = "";
+        }
       }
 
       // Event wiring
