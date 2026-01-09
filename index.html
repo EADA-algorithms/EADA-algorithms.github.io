@@ -573,8 +573,9 @@ vip_receipt = apply_discount(<span class="num">120</span>, <span class="num">0.2
             list was already sorted.
           </div>
           <div class="step">
-            <strong>Costs:</strong> $O(n^2)$ time, $O(1)$ extra space. Fine for
-            small N, bad for large data.
+            <strong>Costs:</strong> O(<em>n</em><sup>2</sup>) time,
+            O(<em>1</em>) extra space. Fine for small n (the number of elements
+            to sort), bad for large data.
           </div>
         </div>
         <div class="card">
@@ -681,27 +682,36 @@ vip_receipt = apply_discount(<span class="num">120</span>, <span class="num">0.2
             2) In code, which condition triggers a swap?
             <div>
               <label
-                ><input type="radio" name="q2" value="a" />if arr[j] &lt; arr[j
-                + 1]</label
+                ><input type="radio" name="q2" value="a" /><code
+                  >if arr[j] &lt; arr[j + 1]</code
+                ></label
               ><br />
               <label
-                ><input type="radio" name="q2" value="b" />if arr[j] == arr[j +
-                1]</label
+                ><input type="radio" name="q2" value="b" /><code
+                  >if arr[j] == arr[j + 1]</code
+                ></label
               ><br />
               <label
-                ><input type="radio" name="q2" value="c" />if arr[j] &gt; arr[j
-                + 1]</label
+                ><input type="radio" name="q2" value="c" /><code
+                  >if arr[j] &gt; arr[j + 1]</code
+                ></label
               >
             </div>
           </div>
           <div class="question">
             3) Complexity check: bubble sort time cost is...
             <div>
-              <label><input type="radio" name="q3" value="a" />O(n log n)</label
+              <label
+                ><input type="radio" name="q3" value="a" />O(<em>n</em>
+                log&nbsp;<em>n</em>)</label
               ><br />
-              <label><input type="radio" name="q3" value="b" />O(n^2)</label
+              <label
+                ><input type="radio" name="q3" value="b" />O(<em>n</em
+                ><sup>2</sup>)</label
               ><br />
-              <label><input type="radio" name="q3" value="c" />O(1)</label>
+              <label
+                ><input type="radio" name="q3" value="c" />O(<em>1</em>)</label
+              >
             </div>
           </div>
           <button id="checkQuiz">Check answers</button>
