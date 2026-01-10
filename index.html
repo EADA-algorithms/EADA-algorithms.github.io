@@ -844,7 +844,7 @@ vip_receipt = apply_discount(<span class="num">120</span>, <span class="num">0.2
       function advancePointers(swapped) {
         const n = state.arr.length;
         const settledNow = n - 1 - state.i;
-        const atPassEnd = state.j >= settledNow;
+        const atPassEnd = state.j >= settledNow - 1; // Exclude the last item from comparison
         if (atPassEnd) {
           state.i += 1;
           state.j = 0;
