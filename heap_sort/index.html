@@ -1,0 +1,1499 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>
+      HeapSort Exchange — Learn Heap Sort (and Python) like a trader
+    </title>
+    <style>
+      :root {
+        --bg0: #070a12;
+        --bg1: #0c1426;
+        --text: #eaf2ff;
+        --muted: #9eb2d3;
+        --warn: #ffcf5a;
+        --bad: #ff5a7a;
+        --good: #3ff08d;
+        --shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+        --radius: 18px;
+        --mono:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        --sans:
+          ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+          Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: var(--sans);
+        color: var(--text);
+        background:
+          radial-gradient(
+            1200px 700px at 10% 0%,
+            rgba(106, 169, 255, 0.18),
+            transparent 55%
+          ),
+          radial-gradient(
+            900px 650px at 85% 10%,
+            rgba(74, 227, 181, 0.16),
+            transparent 60%
+          ),
+          linear-gradient(180deg, var(--bg0), var(--bg1));
+        min-height: 100vh;
+      }
+      header {
+        padding: 22px 18px 14px;
+        position: sticky;
+        top: 0;
+        backdrop-filter: blur(10px);
+        background: rgba(7, 10, 18, 0.62);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        z-index: 9;
+      }
+      .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 10px;
+      }
+      .top {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .logo {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: linear-gradient(
+          135deg,
+          rgba(74, 227, 181, 0.95),
+          rgba(106, 169, 255, 0.95)
+        );
+        box-shadow: var(--shadow);
+        display: grid;
+        place-items: center;
+        color: #06101e;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+      }
+      .brand h1 {
+        font-size: 18px;
+        margin: 0;
+      }
+      .brand p {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .pillrow {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(14, 27, 51, 0.55);
+        padding: 8px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dot.good {
+        background: var(--good);
+      }
+      .dot.warn {
+        background: var(--warn);
+      }
+      .dot.bad {
+        background: var(--bad);
+      }
+      main {
+        padding: 18px 0 34px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1.25fr 0.95fr;
+        gap: 16px;
+      }
+      @media (max-width: 980px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        header {
+          position: relative;
+        }
+      }
+      .card {
+        background: linear-gradient(
+          180deg,
+          rgba(14, 27, 51, 0.82),
+          rgba(11, 22, 48, 0.82)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+      .card .hd {
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .card .hd h2 {
+        margin: 0;
+        font-size: 14px;
+        letter-spacing: 0.2px;
+      }
+      .card .hd .sub {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .card .bd {
+        padding: 14px 16px;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      button {
+        appearance: none;
+        border: none;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        font-weight: 650;
+        letter-spacing: 0.2px;
+        cursor: pointer;
+        transition:
+          transform 0.08s ease,
+          background 0.18s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      button:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+      button.primary {
+        background: linear-gradient(
+          135deg,
+          rgba(74, 227, 181, 0.95),
+          rgba(106, 169, 255, 0.95)
+        );
+        color: #06101e;
+        border-color: rgba(255, 255, 255, 0);
+      }
+      button.warn {
+        background: rgba(255, 207, 90, 0.14);
+        border-color: rgba(255, 207, 90, 0.25);
+      }
+      button.danger {
+        background: rgba(255, 90, 122, 0.14);
+        border-color: rgba(255, 90, 122, 0.25);
+      }
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+      .mini {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .range {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.03);
+      }
+      input[type="range"] {
+        width: 160px;
+      }
+      .array {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        padding: 10px;
+        border-radius: 16px;
+        background: rgba(0, 0, 0, 0.18);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+      }
+      .stock {
+        width: 44px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 8px 6px;
+        text-align: center;
+        transition:
+          transform 0.2s ease,
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+        user-select: none;
+      }
+      .stock .sym {
+        font-size: 10px;
+        color: var(--muted);
+        letter-spacing: 0.7px;
+      }
+      .stock .val {
+        font-family: var(--mono);
+        font-size: 13px;
+        margin-top: 4px;
+      }
+      .stock .bar {
+        height: 6px;
+        border-radius: 999px;
+        margin: 8px 0 2px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+      }
+      .stock .bar > i {
+        display: block;
+        height: 100%;
+        width: 40%;
+        background: linear-gradient(
+          90deg,
+          rgba(74, 227, 181, 0.9),
+          rgba(106, 169, 255, 0.9)
+        );
+        border-radius: 999px;
+      }
+      .stock.active {
+        border-color: rgba(74, 227, 181, 0.7);
+        box-shadow: 0 0 0 4px rgba(74, 227, 181, 0.1);
+        transform: translateY(-2px);
+      }
+      .stock.swap {
+        border-color: rgba(255, 207, 90, 0.75);
+        box-shadow: 0 0 0 4px rgba(255, 207, 90, 0.12);
+        transform: translateY(-3px) scale(1.03);
+      }
+      .stock.sorted {
+        border-color: rgba(63, 240, 141, 0.6);
+        background: rgba(63, 240, 141, 0.06);
+      }
+      .stock.out {
+        opacity: 0.55;
+      }
+      .twoCol {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      @media (max-width: 700px) {
+        .twoCol {
+          grid-template-columns: 1fr;
+        }
+      }
+      canvas {
+        width: 100%;
+        height: 160px;
+        border-radius: 16px;
+        background: rgba(0, 0, 0, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .heapview {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .svgbox {
+        border-radius: 16px;
+        background: rgba(0, 0, 0, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        min-height: 240px;
+      }
+      .legend {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .chip {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .chip b {
+        color: var(--text);
+      }
+      .stepbox {
+        padding: 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .stepbox h3 {
+        margin: 0 0 6px;
+        font-size: 13px;
+      }
+      .stepbox p {
+        margin: 6px 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      details {
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      details summary {
+        cursor: pointer;
+        padding: 12px 14px;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--text);
+        font-weight: 700;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      details summary::-webkit-details-marker {
+        display: none;
+      }
+      .kbd {
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.22);
+        color: var(--text);
+      }
+      pre {
+        margin: 0;
+        padding: 12px;
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        overflow: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        line-height: 1.5;
+        color: #eaf2ff;
+      }
+      .quiz {
+        display: grid;
+        gap: 10px;
+      }
+      .q {
+        padding: 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .q .qhd {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .q h4 {
+        margin: 0;
+        font-size: 13px;
+      }
+      .q p {
+        margin: 6px 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .choices {
+        display: grid;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      label.choice {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 10px 10px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.18);
+        cursor: pointer;
+        transition:
+          background 0.18s ease,
+          transform 0.08s ease,
+          border-color 0.18s ease;
+      }
+      label.choice:hover {
+        background: rgba(0, 0, 0, 0.26);
+      }
+      label.choice:active {
+        transform: translateY(1px);
+      }
+      input[type="radio"] {
+        margin-top: 2px;
+      }
+      .tag {
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .result {
+        margin-top: 10px;
+        padding: 10px 10px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.18);
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .result.good {
+        border-color: rgba(63, 240, 141, 0.3);
+        background: rgba(63, 240, 141, 0.08);
+      }
+      .result.bad {
+        border-color: rgba(255, 90, 122, 0.28);
+        background: rgba(255, 90, 122, 0.08);
+      }
+      .footerNote {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap top">
+        <div class="brand">
+          <div class="logo">HS</div>
+          <div>
+            <h1>HeapSort Exchange</h1>
+            <p>
+              Turn an array into a “market heap”, then cash out: heapsort in
+              action — with Python basics for first-timers.
+            </p>
+          </div>
+        </div>
+        <div class="pillrow">
+          <div class="pill">
+            <span class="dot good"></span>Interactive simulation
+          </div>
+          <div class="pill">
+            <span class="dot warn"></span>Python fundamentals
+          </div>
+          <div class="pill">
+            <span class="dot bad"></span>Watch for off-by-one errors
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="grid">
+        <section class="card">
+          <div class="hd">
+            <div>
+              <h2>Trading Floor</h2>
+              <div class="sub">
+                Your “prices” are the array. Build a max-heap (best stock at the
+                top), then sell the top one by one.
+              </div>
+            </div>
+            <div class="sub">
+              <span class="kbd">children</span> = <span class="kbd">2i+1</span>,
+              <span class="kbd">2i+2</span> &nbsp;·&nbsp;
+              <span class="kbd">parent</span> =
+              <span class="kbd">(i-1)//2</span>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="twoCol">
+              <div>
+                <div class="controls">
+                  <button class="primary" id="btnNew">New Market Day</button>
+                  <button id="btnStep">Step</button>
+                  <button id="btnAuto">Auto ▶</button>
+                  <button class="warn" id="btnReset">Reset</button>
+                  <button class="danger" id="btnFastForward">Finish ⏭</button>
+                </div>
+
+                <div style="height: 10px"></div>
+
+                <div class="row">
+                  <div class="range">
+                    <span class="mini"><b>n</b> stocks</span>
+                    <input
+                      id="nRange"
+                      type="range"
+                      min="6"
+                      max="16"
+                      value="10"
+                    />
+                    <span class="mini" id="nLabel">10</span>
+                  </div>
+                  <div class="range">
+                    <span class="mini"><b>speed</b></span>
+                    <input
+                      id="speedRange"
+                      type="range"
+                      min="0"
+                      max="100"
+                      value="55"
+                    />
+                    <span class="mini" id="speedLabel">medium</span>
+                  </div>
+                  <div class="range">
+                    <label
+                      class="mini"
+                      style="
+                        display: flex;
+                        gap: 8px;
+                        align-items: center;
+                        cursor: pointer;
+                      "
+                    >
+                      <input type="checkbox" id="chkExplain" checked />
+                      explain every step
+                    </label>
+                  </div>
+                </div>
+
+                <div style="height: 12px"></div>
+
+                <div class="legend">
+                  <span class="chip"
+                    ><span class="dot good"></span>sorted tail</span
+                  >
+                  <span class="chip"><span class="dot warn"></span>swap</span>
+                  <span class="chip"
+                    ><span class="dot bad"></span>out of heap</span
+                  >
+                  <span class="chip"
+                    ><b>Phase:</b>&nbsp;<span id="phaseText"
+                      >build max-heap</span
+                    ></span
+                  >
+                </div>
+
+                <div style="height: 12px"></div>
+
+                <div class="array" id="arrayBox" aria-label="array"></div>
+
+                <div style="height: 12px"></div>
+
+                <div class="stepbox">
+                  <h3 id="stepTitle">What’s happening right now</h3>
+                  <p id="stepText">
+                    Press <b>Step</b> to begin. We’ll first build a max-heap
+                    from the prices.
+                  </p>
+                  <div class="footerNote">
+                    Business intuition: in a <b>max-heap</b>, the
+                    best-performing stock is always at the top — so selling the
+                    top repeatedly gives a sorted list (from low to high) in the
+                    array’s tail.
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div class="heapview">
+                  <div class="mini">“Market chart” (just for vibes):</div>
+                  <canvas
+                    id="chart"
+                    width="520"
+                    height="160"
+                    aria-label="line chart"
+                  ></canvas>
+
+                  <div class="mini">Heap as a binary tree (array-backed):</div>
+                  <div class="svgbox">
+                    <svg
+                      id="heapSvg"
+                      viewBox="0 0 900 420"
+                      width="100%"
+                      height="100%"
+                      role="img"
+                      aria-label="heap tree"
+                    ></svg>
+                  </div>
+                  <div class="mini">
+                    Tip: heapsort is <b>O(n log n)</b> time and
+                    <b>O(1)</b> extra memory (in-place).
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="card">
+          <div class="hd">
+            <div>
+              <h2>Lesson Console</h2>
+              <div class="sub">
+                Algorithm concept + Python basics (even if you’ve never coded).
+              </div>
+            </div>
+            <div class="tag" id="scoreTag">Quiz score: 0/3</div>
+          </div>
+          <div class="bd" style="display: grid; gap: 12px">
+            <details open>
+              <summary>
+                <span>1) The story of heap sort (in one minute)</span>
+                <span class="kbd">why it works</span>
+              </summary>
+              <div style="padding: 12px 14px; display: grid; gap: 10px">
+                <div
+                  class="mini"
+                  style="line-height: 1.65; color: var(--muted)"
+                >
+                  <b>Heap sort</b> is like running a tiny “stock exchange”:
+                  <ul style="margin: 8px 0 0 18px">
+                    <li>
+                      <b>Build a max-heap</b> so the largest value sits at index
+                      0.
+                    </li>
+                    <li>
+                      <b>Sell the winner</b>: swap index 0 with the last element
+                      in the heap.
+                    </li>
+                    <li>
+                      <b>Shrink the heap</b> by 1 (the sold stock is now
+                      “locked” in the sorted tail).
+                    </li>
+                    <li>
+                      <b>Restore the heap</b> with <b>sift down</b> (a.k.a.
+                      <b>heapify</b>).
+                    </li>
+                  </ul>
+                  Repeat until everything is sorted.
+                </div>
+
+                <div class="stepbox">
+                  <h3>Core invariant (the correctness “anchor”)</h3>
+                  <p>
+                    At all times during sorting:
+                    <br />
+                    <b>(1)</b> The prefix is a valid max-heap (best value at the
+                    root), and <b>(2)</b> the suffix is already sorted and never
+                    touched again.
+                  </p>
+                </div>
+              </div>
+            </details>
+
+            <details open>
+              <summary>
+                <span>2) Python basics you need (seriously minimal)</span>
+                <span class="kbd">copy/paste</span>
+              </summary>
+              <div style="padding: 12px 14px; display: grid; gap: 10px">
+                <div
+                  class="mini"
+                  style="line-height: 1.65; color: var(--muted)"
+                >
+                  If you’ve never programmed, you can still do this. We only
+                  need:
+                  <ul style="margin: 8px 0 0 18px">
+                    <li><b>Variables</b> (names for values)</li>
+                    <li><b>Lists</b> (arrays)</li>
+                    <li><b>Indexing</b> and <b>swapping</b></li>
+                    <li>
+                      <b>Loops</b> (<span class="kbd">for</span> and
+                      <span class="kbd">while</span>)
+                    </li>
+                    <li><b>Functions</b></li>
+                    <li>
+                      Integer division <span class="kbd">//</span> (important
+                      for parents!)
+                    </li>
+                  </ul>
+                </div>
+                <pre id="pyBasics"></pre>
+                <div class="mini">
+                  Why <span class="kbd">//</span> and not
+                  <span class="kbd">/</span>? In Python,
+                  <span class="kbd">/</span> makes a float (like
+                  <span class="kbd">3/2 == 1.5</span>), but
+                  <span class="kbd">//</span> keeps an integer index (like
+                  <span class="kbd">3//2 == 1</span>).
+                </div>
+              </div>
+            </details>
+
+            <details open>
+              <summary>
+                <span>3) Heap sort in Python (clean reference)</span>
+                <span class="kbd">heapsort</span>
+              </summary>
+              <div style="padding: 12px 14px; display: grid; gap: 10px">
+                <pre id="pyHeapSort"></pre>
+                <div
+                  class="mini"
+                  style="line-height: 1.65; color: var(--muted)"
+                >
+                  Don’t memorize. Instead, connect the code to what you see on
+                  the Trading Floor.
+                </div>
+              </div>
+            </details>
+
+            <details open>
+              <summary>
+                <span>4) Mini-quiz (business + CS intuition)</span>
+                <span class="kbd">3 questions</span>
+              </summary>
+              <div style="padding: 12px 14px">
+                <div class="quiz" id="quiz"></div>
+                <div class="result" id="quizResult" style="display: none"></div>
+                <div style="height: 10px"></div>
+                <button id="btnGrade" class="primary">Grade quiz</button>
+              </div>
+            </details>
+
+            <details>
+              <summary>
+                <span>5) Stretch: what’s “log n” in plain English?</span>
+                <span class="kbd">intuition</span>
+              </summary>
+              <div
+                style="
+                  padding: 12px 14px;
+                  color: var(--muted);
+                  line-height: 1.65;
+                  font-size: 13px;
+                "
+              >
+                Every time you “sift down”, you move one level in a tree. A heap
+                with <b>n</b> elements has about <b>log₂(n)</b> levels. So one
+                <b>heapify</b> is about <b>log n</b> steps. Heapsort does about
+                <b>n</b> heapifies → roughly <b>n log n</b> work.
+              </div>
+            </details>
+
+            <div class="footerNote">
+              Works offline. Save this file, then open it in
+              <b>Chrome</b> (double click).
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <script>
+      const $ = (sel) => document.querySelector(sel);
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+      function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      const SYMBOLS = [
+        "AIX",
+        "BIZ",
+        "ROI",
+        "CFO",
+        "AIQ",
+        "MLB",
+        "LTV",
+        "CAC",
+        "NPS",
+        "OKR",
+        "KPI",
+        "MKT",
+        "Saa",
+        "ARR",
+        "REV",
+        "NNO",
+        "LLM",
+        "MCP",
+        "DTA",
+        "B2B",
+      ];
+
+      let arr = [];
+      let symbols = [];
+      let heapSize = 0;
+      let phase = "build";
+      let buildI = 0;
+      let active = new Set();
+      let swapping = new Set();
+      let sortedTailFrom = Infinity;
+      let autoTimer = null;
+      let speedMs = 420;
+      let explain = true;
+
+      const arrayBox = $("#arrayBox");
+      const heapSvg = $("#heapSvg");
+      const chart = $("#chart");
+      const ctx = chart.getContext("2d");
+
+      const btnNew = $("#btnNew");
+      const btnStep = $("#btnStep");
+      const btnAuto = $("#btnAuto");
+      const btnReset = $("#btnReset");
+      const btnFastForward = $("#btnFastForward");
+
+      const nRange = $("#nRange");
+      const nLabel = $("#nLabel");
+      const speedRange = $("#speedRange");
+      const speedLabel = $("#speedLabel");
+      const chkExplain = $("#chkExplain");
+
+      function renderArray() {
+        arrayBox.innerHTML = "";
+        const maxVal = Math.max(...arr);
+        const minVal = Math.min(...arr);
+        const span = Math.max(1, maxVal - minVal);
+
+        arr.forEach((v, i) => {
+          const el = document.createElement("div");
+          el.className = "stock";
+          if (i >= heapSize) el.classList.add("out");
+          if (i >= sortedTailFrom) el.classList.add("sorted");
+          if (active.has(i)) el.classList.add("active");
+          if (swapping.has(i)) el.classList.add("swap");
+
+          const sym = document.createElement("div");
+          sym.className = "sym";
+          sym.textContent = symbols[i] ?? "STK" + i;
+
+          const val = document.createElement("div");
+          val.className = "val";
+          val.textContent = v;
+
+          const bar = document.createElement("div");
+          bar.className = "bar";
+          const fill = document.createElement("i");
+          const pct = ((v - minVal) / span) * 100;
+          fill.style.width = (10 + (85 * pct) / 100).toFixed(1) + "%";
+          bar.appendChild(fill);
+
+          el.appendChild(sym);
+          el.appendChild(val);
+          el.appendChild(bar);
+
+          const idx = document.createElement("div");
+          idx.className = "sym";
+          idx.textContent = "#" + i;
+          el.appendChild(idx);
+
+          arrayBox.appendChild(el);
+        });
+      }
+
+      function drawChart() {
+        const w = chart.width,
+          h = chart.height;
+        ctx.clearRect(0, 0, w, h);
+
+        ctx.globalAlpha = 0.22;
+        ctx.strokeStyle = "#FFFFFF";
+        ctx.lineWidth = 1;
+        for (let x = 0; x <= w; x += 52) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+          ctx.stroke();
+        }
+        for (let y = 0; y <= h; y += 32) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+
+        const maxV = Math.max(...arr),
+          minV = Math.min(...arr);
+        const pad = 18;
+        const span = Math.max(1, maxV - minV);
+        const xStep = (w - 2 * pad) / Math.max(1, arr.length - 1);
+
+        ctx.strokeStyle = "#6AA9FF";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        arr.forEach((v, i) => {
+          const x = pad + i * xStep;
+          const y = pad + (h - 2 * pad) * (1 - (v - minV) / span);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        ctx.fillStyle = "#4AE3B5";
+        arr.forEach((v, i) => {
+          const x = pad + i * xStep;
+          const y = pad + (h - 2 * pad) * (1 - (v - minV) / span);
+          ctx.beginPath();
+          ctx.arc(x, y, 3.2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      function svgLine(x1, y1, x2, y2, color) {
+        const line = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "line",
+        );
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", color);
+        line.setAttribute("stroke-width", "2");
+        return line;
+      }
+
+      function renderHeapSvg() {
+        heapSvg.innerHTML = "";
+        const n = heapSize;
+        if (n <= 0) return;
+
+        const marginTop = 32;
+        const levelGap = 92;
+        const nodeR = 22;
+
+        function pos(i) {
+          const level = Math.floor(Math.log2(i + 1));
+          const levelStart = (1 << level) - 1;
+          const levelCount = Math.min(1 << level, n - levelStart);
+          const idxInLevel = i - levelStart;
+          const xPadding = 60;
+          const width = 900 - 2 * xPadding;
+          const xStep = width / Math.max(1, levelCount - 1);
+          const x =
+            xPadding + (levelCount === 1 ? width / 2 : idxInLevel * xStep);
+          const y = marginTop + level * levelGap;
+          return { x, y };
+        }
+
+        for (let i = 0; i < n; i++) {
+          const l = 2 * i + 1,
+            r = 2 * i + 2;
+          const p = pos(i);
+          if (l < n) {
+            const c = pos(l);
+            heapSvg.appendChild(
+              svgLine(p.x, p.y, c.x, c.y, "rgba(255,255,255,.18)"),
+            );
+          }
+          if (r < n) {
+            const c = pos(r);
+            heapSvg.appendChild(
+              svgLine(p.x, p.y, c.x, c.y, "rgba(255,255,255,.18)"),
+            );
+          }
+        }
+
+        for (let i = 0; i < n; i++) {
+          const p = pos(i);
+          const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          const isAct = active.has(i);
+          const isSwap = swapping.has(i);
+          const fill = isSwap
+            ? "rgba(255,207,90,.20)"
+            : isAct
+              ? "rgba(74,227,181,.18)"
+              : "rgba(255,255,255,.06)";
+          const stroke = isSwap
+            ? "rgba(255,207,90,.85)"
+            : isAct
+              ? "rgba(74,227,181,.75)"
+              : "rgba(255,255,255,.18)";
+
+          const circle = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "circle",
+          );
+          circle.setAttribute("cx", p.x);
+          circle.setAttribute("cy", p.y);
+          circle.setAttribute("r", nodeR);
+          circle.setAttribute("fill", fill);
+          circle.setAttribute("stroke", stroke);
+          circle.setAttribute("stroke-width", "2");
+
+          const t1 = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          t1.setAttribute("x", p.x);
+          t1.setAttribute("y", p.y + 4);
+          t1.setAttribute("text-anchor", "middle");
+          t1.setAttribute(
+            "font-family",
+            "ui-monospace, Menlo, Consolas, monospace",
+          );
+          t1.setAttribute("font-size", "12");
+          t1.setAttribute("fill", "rgba(234,242,255,.98)");
+          t1.textContent = String(arr[i]);
+
+          g.appendChild(circle);
+          g.appendChild(t1);
+          heapSvg.appendChild(g);
+        }
+      }
+
+      function renderAll() {
+        $("#phaseText").textContent =
+          phase === "build"
+            ? "build max-heap"
+            : phase === "sort"
+              ? "sell top & heapify"
+              : "done";
+        renderArray();
+        drawChart();
+        renderHeapSvg();
+        btnStep.disabled = phase === "done";
+        btnFastForward.disabled = phase === "done";
+      }
+
+      function swap(i, j) {
+        const t = arr[i];
+        arr[i] = arr[j];
+        arr[j] = t;
+        const s = symbols[i];
+        symbols[i] = symbols[j];
+        symbols[j] = s;
+      }
+
+      function siftDown(i, size) {
+        const actions = [];
+        while (true) {
+          const l = 2 * i + 1;
+          const r = 2 * i + 2;
+          let largest = i;
+
+          actions.push({ type: "compare", a: i, b: l, ok: l < size });
+          if (l < size && arr[l] > arr[largest]) largest = l;
+
+          actions.push({ type: "compare", a: largest, b: r, ok: r < size });
+          if (r < size && arr[r] > arr[largest]) largest = r;
+
+          if (largest === i) break;
+          actions.push({ type: "swap", a: i, b: largest });
+          swap(i, largest);
+          i = largest;
+        }
+        return actions;
+      }
+
+      function setExplain(title, text) {
+        if (!explain) return;
+        $("#stepTitle").textContent = title;
+        $("#stepText").innerHTML = text;
+      }
+
+      function clearHighlights() {
+        active = new Set();
+        swapping = new Set();
+      }
+
+      async function animateActions(actions) {
+        for (const act of actions) {
+          clearHighlights();
+          if (act.type === "compare") {
+            if (act.ok) {
+              active.add(act.a);
+              active.add(act.b);
+            }
+            setExplain(
+              "Compare",
+              `Compare parent/child to keep max-heap property.`,
+            );
+            renderAll();
+            await sleep(speedMs * 0.45);
+          } else if (act.type === "swap") {
+            swapping.add(act.a);
+            swapping.add(act.b);
+            setExplain("Swap", `Swap to move the larger value upward.`);
+            renderAll();
+            await sleep(speedMs * 0.75);
+          }
+        }
+        clearHighlights();
+        renderAll();
+      }
+
+      function initBuildPhase() {
+        phase = "build";
+        heapSize = arr.length;
+        sortedTailFrom = Infinity;
+        buildI = Math.floor((heapSize - 2) / 2);
+        setExplain(
+          "Phase 1: Build a max-heap",
+          `Start heapifying from last parent index <b>${buildI}</b>.`,
+        );
+      }
+      function initSortPhase() {
+        phase = "sort";
+        setExplain(
+          "Phase 2: Sort",
+          `Swap the root with the end, shrink heap, then heapify again.`,
+        );
+      }
+
+      async function oneStep() {
+        if (phase === "done") return;
+
+        if (phase === "build") {
+          if (buildI < 0) {
+            initSortPhase();
+            renderAll();
+            return;
+          }
+          const actions = siftDown(buildI, heapSize);
+          await animateActions(actions);
+          buildI -= 1;
+          if (buildI < 0)
+            setExplain(
+              "Max-heap built",
+              "Next step begins sorting (selling winners).",
+            );
+          renderAll();
+          return;
+        }
+
+        if (phase === "sort") {
+          if (heapSize <= 1) {
+            phase = "done";
+            sortedTailFrom = 0;
+            setExplain("Done ✅", "All elements are sorted.");
+            renderAll();
+            stopAuto();
+            return;
+          }
+          clearHighlights();
+          swapping.add(0);
+          swapping.add(heapSize - 1);
+          setExplain(
+            "Extract max",
+            `Swap root with index <b>${heapSize - 1}</b> to lock the maximum into the sorted tail.`,
+          );
+          renderAll();
+          await sleep(speedMs * 0.7);
+          swap(0, heapSize - 1);
+
+          heapSize -= 1;
+          sortedTailFrom = heapSize;
+
+          const actions = siftDown(0, heapSize);
+          await animateActions(actions);
+          renderAll();
+        }
+      }
+
+      async function finishAll() {
+        stopAuto();
+        let guard = 0;
+        while (phase !== "done" && guard < 5000) {
+          await oneStep();
+          guard++;
+        }
+      }
+
+      function speedFromSlider(v) {
+        return clamp(900 - (v / 100) * 830, 70, 900);
+      }
+      function speedLabelFromMs(ms) {
+        if (ms < 140) return "very fast";
+        if (ms < 260) return "fast";
+        if (ms < 420) return "medium";
+        if (ms < 620) return "slow";
+        return "very slow";
+      }
+
+      function stopAuto() {
+        if (autoTimer) {
+          clearInterval(autoTimer);
+          autoTimer = null;
+          btnAuto.textContent = "Auto ▶";
+        }
+      }
+      function startAuto() {
+        stopAuto();
+        btnAuto.textContent = "Auto ⏸";
+        autoTimer = setInterval(
+          () => {
+            oneStep();
+          },
+          Math.max(120, speedMs * 0.9),
+        );
+      }
+
+      function newMarketDay(n) {
+        stopAuto();
+        const used = new Set();
+        arr = [];
+        symbols = [];
+        while (arr.length < n) {
+          const v = randInt(-30, 120);
+          if (!used.has(v)) {
+            used.add(v);
+            arr.push(v);
+          }
+        }
+        const pool = [...SYMBOLS];
+        for (let i = 0; i < n; i++) {
+          const pick =
+            pool.splice(randInt(0, pool.length - 1), 1)[0] || "STK" + i;
+          symbols.push(pick);
+        }
+        initBuildPhase();
+        clearHighlights();
+        renderAll();
+      }
+      function resetSameDay() {
+        stopAuto();
+        initBuildPhase();
+        clearHighlights();
+        renderAll();
+      }
+
+      $("#pyBasics").textContent = `# ✅ Python basics (just enough to start)
+
+price = 42              # variable
+prices = [5, 1, 4, 2, 8] # list (array)
+
+n = len(prices)         # length
+first = prices[0]       # indexing
+
+# swap trick
+prices[0], prices[1] = prices[1], prices[0]
+
+# loop
+for i in range(n):
+    print(i, prices[i])
+
+# parent index needs integer division
+i = 7
+parent = (i - 1) // 2
+`;
+
+      $("#pyHeapSort").textContent = `def sift_down(a, i, size):
+    while True:
+        left  = 2*i + 1
+        right = 2*i + 2
+        largest = i
+
+        if left < size and a[left] > a[largest]:
+            largest = left
+        if right < size and a[right] > a[largest]:
+            largest = right
+
+        if largest == i:
+            break
+
+        a[i], a[largest] = a[largest], a[i]
+        i = largest
+
+def heap_sort(a):
+    n = len(a)
+
+    for i in range((n - 2)//2, -1, -1):
+        sift_down(a, i, n)
+
+    for end in range(n - 1, 0, -1):
+        a[0], a[end] = a[end], a[0]
+        sift_down(a, 0, end)
+`;
+
+      const quizData = [
+        {
+          id: "q1",
+          tag: "Index math",
+          q: "If a node is at index i in a 0-based heap array, what are its children indices?",
+          choices: [
+            { k: "a", t: "left = 2*i, right = 2*i + 1" },
+            { k: "b", t: "left = 2*i + 1, right = 2*i + 2", ok: true },
+            { k: "c", t: "left = i/2, right = i/2 + 1" },
+          ],
+          explain: "Children of i are 2i+1 and 2i+2.",
+        },
+        {
+          id: "q2",
+          tag: "Algorithm idea",
+          q: "After extracting the max (swapping root with end), what’s next?",
+          choices: [
+            { k: "a", t: "Increase heap size." },
+            {
+              k: "b",
+              t: "Shrink heap by 1 and sift down from root.",
+              ok: true,
+            },
+            { k: "c", t: "Random shuffle." },
+          ],
+          explain: "We shrink heapSize and restore heap with siftDown(0).",
+        },
+        {
+          id: "q3",
+          tag: "Python detail",
+          q: "Why use (i-1)//2 for the parent index in Python?",
+          choices: [
+            {
+              k: "a",
+              t: "Because // returns an integer for indexing.",
+              ok: true,
+            },
+            { k: "b", t: "Because / returns a string." },
+            { k: "c", t: "Because it makes heapsort O(1)." },
+          ],
+          explain: "Indexes must be integers; / returns float.",
+        },
+      ];
+
+      function renderQuiz() {
+        const root = $("#quiz");
+        root.innerHTML = "";
+        quizData.forEach((qq, idx) => {
+          const box = document.createElement("div");
+          box.className = "q";
+          box.innerHTML = `
+      <div class="qhd">
+        <div>
+          <h4>Q${idx + 1}. ${qq.q}</h4>
+          <p class="tag">${qq.tag}</p>
+        </div>
+        <div class="tag">pick one</div>
+      </div>
+      <div class="choices">
+        ${qq.choices
+          .map(
+            (c) => `
+          <label class="choice">
+            <input type="radio" name="${qq.id}" value="${c.k}">
+            <div>${c.t}</div>
+          </label>
+        `,
+          )
+          .join("")}
+      </div>
+    `;
+          root.appendChild(box);
+        });
+      }
+      function gradeQuiz() {
+        let score = 0;
+        const feedback = [];
+        quizData.forEach((qq, idx) => {
+          const chosen = document.querySelector(
+            `input[name="${qq.id}"]:checked`,
+          );
+          const pick = chosen ? chosen.value : null;
+          const correct = qq.choices.find((c) => c.ok)?.k;
+          if (pick === correct) {
+            score++;
+            feedback.push(`✅ Q${idx + 1}: correct.`);
+          } else {
+            feedback.push(
+              `❌ Q${idx + 1}: correct is <b>${correct}</b>. ${qq.explain}`,
+            );
+          }
+        });
+        const out = $("#quizResult");
+        out.style.display = "block";
+        out.className =
+          "result " + (score === quizData.length ? "good" : "bad");
+        out.innerHTML =
+          `<b>Your score: ${score}/${quizData.length}</b><br/>` +
+          feedback.join("<br/>");
+        $("#scoreTag").textContent = `Quiz score: ${score}/${quizData.length}`;
+      }
+      $("#btnGrade").addEventListener("click", gradeQuiz);
+
+      btnNew.addEventListener("click", () =>
+        newMarketDay(parseInt(nRange.value, 10)),
+      );
+      btnReset.addEventListener("click", () => resetSameDay());
+      btnStep.addEventListener("click", () => oneStep());
+      btnFastForward.addEventListener("click", () => finishAll());
+      btnAuto.addEventListener("click", () => {
+        if (autoTimer) stopAuto();
+        else startAuto();
+      });
+
+      nRange.addEventListener("input", () => {
+        nLabel.textContent = nRange.value;
+      });
+      nRange.addEventListener("change", () => {
+        newMarketDay(parseInt(nRange.value, 10));
+      });
+
+      speedRange.addEventListener("input", () => {
+        speedMs = speedFromSlider(parseInt(speedRange.value, 10));
+        speedLabel.textContent = speedLabelFromMs(speedMs);
+        if (autoTimer) {
+          startAuto();
+        }
+      });
+
+      chkExplain.addEventListener("change", () => {
+        explain = chkExplain.checked;
+        if (!explain) {
+          $("#stepTitle").textContent = "Explainer is off";
+          $("#stepText").textContent =
+            "Toggle “explain every step” back on if you want guidance for each operation.";
+        } else {
+          setExplain(
+            "Explainer is on",
+            "Press <b>Step</b> to see the algorithm narrated.",
+          );
+        }
+      });
+
+      renderQuiz();
+      nLabel.textContent = nRange.value;
+      speedMs = speedFromSlider(parseInt(speedRange.value, 10));
+      speedLabel.textContent = speedLabelFromMs(speedMs);
+      explain = chkExplain.checked;
+      newMarketDay(parseInt(nRange.value, 10));
+    </script>
+  </body>
+</html>
